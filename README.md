@@ -83,7 +83,7 @@
     - Pode overfittar, parâmetros ficam enormes
 - Como otimiza/tuna:
     - Escolhe bem as funções e composições
-        - Foward/Fackward/Mixed selection
+        - Best ou Stepwise Foward/Backward/Mixed selection
     - Regulariza os parâmetros
         - Lasso e Ridge
 - O que entra/sai:
@@ -122,6 +122,7 @@
     - Fit e predict rápido
     - Resulta numa árvore de decisão muito clara
     - Gini permite entender relevância das variáveis
+        - Gini próximo de 0 indica que a maioria dos exemplos naquele nó é da mesma classe (puro)
 - Pontos fracos:
     - Variância relativamente alta, pode mudar um tanto conforme amostra
     - Algorirtmo de fit pode não conseguir encontrar boa separação pelo paradigma guloso
@@ -152,10 +153,13 @@
     - Depende fortemente da amostra (variância alta)
     - Dados longe de clumps não tem muito parâmetro
 - Como otimiza/tuna:
-    - Seleciona K (validação cruzada, pra tunar qualquer parâmetro)
+    - Seleciona K (validação cruzada, como para tunar qualquer parâmetro)
     - Normaliza features
+        - Alteração no espaço das features distorce a métrica e pode piorar ou melhorar
     - Pega mais dados
+        - Maior densidade de dados permite médias mais "locais"
     - Bagging talvez funcione
+        - Trata a variância extrema do modelo
     - Troca de modelo
 - O que entra/sai:
     - Entra dado numérico (mesmo que encoder de classe) e sair qualquer coisa
@@ -166,9 +170,10 @@
 - O que faz:
     - Roda o algoritmo de backpropagate para fazer descida de gradiente e minimizar a loss
         - Backpropagate calcula a derivada de cada camada, começando da última e usando a regra da cadeia pra calcular das próximas até calcular a derivada da rede toda
+        - Usa um otimizador não-linear para buscar um mínimo local
 - Pontos fortes:
     - Adaptável à dados não estruturados (imagens)
-    - Paralelizável (stockastical gradient descent), então pode ficar ráido
+    - Paralelizável (stockastical gradient descent), então pode ficar rápido com gpu
 - Pontos fracos:
     - Precisa de muitos dados pra convergir
         - Muitos parâmetros
@@ -177,7 +182,7 @@
     - Função/funções de ativação
     - Inicialização dos pesos
     - Algoritmo de descida de gradiente e learning rate
-    - Topologia da rede
+    - Topologia da rede/arquitetura
 - O que entra/sai: 
     - Depende da rede
 
@@ -188,9 +193,11 @@
 ### Regressão Logística
 - Hipótese sobre os dados:
     - Supõe que uma combinação linear das features passadas pela função logística caracteriza a probabilidade de pertencer àquela classe
+    - Se baseia na distribuição/probabilidade à posteriori
 - O que faz:
-    - Fita a função logística baseado nas features. Fronteira não linear
+    - Fita a função logística baseado nas features (distribuição conjunta). Fronteira não linear
 - Pontos fortes:
+    - Não importa se houver correlação entre features
     - Simples de interpretar
     - Retorna probabilidade então dá pra calibrar curva ROC
 - Pontos fracos:
@@ -239,11 +246,13 @@
 
 ### Naive Bayes
 - Hipótese sobre os dados:
+    - Feature são independentes entre si (nem sempre são na realidade)
+        - Usa para calcular a probabilidade à priori, baseado nas distribuições condicionais à posterioris
     - Supõe que
         - Bernoulli: features vieram de distribuições de Bernoulli (0 ou 1) (útil para onehot encoder)
         - Gaussiano: Assume que features foram amostradas de distribuição normal
 - O que faz:
-    - Usa a distribuição à posteriori para estimar a probablidade à priori usando o Teorema de Bayes da probabilidade condicional
+    - Usa a distribuição à posteriori para estimar a probablidade à priori usando o Teorema de Bayes da probabilidade condicional $$ P(y|x) = \frac{P(x|y)P(x)}{P(y)}$$
 - Pontos fortes:
     - Multiclass
     - Tem método para só incrementar os parâmetros, bom para escalar
@@ -251,7 +260,9 @@
 - Pontos fracos:
     - Classes precisam estar bem separados
     - Precisa entender a distribuição das features
-- Como otimiza/tuna:
+    - Correlação entre features
+- Como otimiza/tuna:    
+    - PCA para tentar deixar features independentes (?)
     - Feature selection
     - Encontra qual distribuição se assemelha aos dados
     - Boosting, bootstaping
@@ -278,7 +289,16 @@
 # Avalição de Modelos
 ## Métricas
 ### KS
+- Mede separação entre duas distribuições
+    - Separação perfeita -> 1
+    - Mesma distribuição -> 0
+- Somente classificação binária
+    - Pode fazer OnevOne ou OnevRest
+- Para dados desbalanceados?
 ### Gini
+- Mostra a "impureza" nos dados
+    - Quão mal estão distribuidos em uma feature
+    - Quão misturados os dados estão
 ### AUC 
 ### RMSE
 ### MAE
@@ -308,7 +328,7 @@
 ### Joelho/ Elbow
 ### Sillouette
 ### Distância Intra/Entre-Cluster
-## etc. (motivo à priori ou prático)
+### etc. (motivo à priori ou prático)
 
 # Data Prep
 ## Tratamento de missings 
